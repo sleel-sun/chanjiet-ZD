@@ -1,0 +1,29 @@
+{
+  "name": "chanjiet-zd",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "T+ 19.0 database dictionary MCP service",
+  "bin": {
+    "tplus-dictionary-mcp": "dist/mcp/server.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "build:index": "tsx src/parser/build-index.ts",
+    "test": "vitest run",
+    "start": "node dist/mcp/server.js",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.13.0",
+    "cheerio": "^1.0.0",
+    "iconv-lite": "^0.6.3",
+    "zod": "^3.25.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.8.0",
+    "vitest": "^3.2.0"
+  }
+}
