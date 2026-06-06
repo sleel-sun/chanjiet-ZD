@@ -1,5 +1,5 @@
 import { readFile } from "node:fs/promises";
-import { join } from "node:path";
+import { relative, resolve } from "node:path";
 import { decodeHtml } from "../parser/parse-html.js";
 import { DictionaryError } from "./errors.js";
 import type {
@@ -94,7 +94,7 @@ export async function readRawHtml(
   input: RawHtmlLookupInput,
 ): Promise<{ sourceFile: string; html: string }> {
   const sourceFile = input.sourceFile ?? findObject(index, input).sourceFile;
-  const absolutePath = join(index.source.extractDir, sourceFile);
+  const absolutePath = resolveSourceFile(index.source.extractDir, sourceFile);
 
   try {
     const buffer = await readFile(absolutePath);
@@ -106,6 +106,21 @@ export async function readRawHtml(
       cause: error instanceof Error ? error.message : String(error),
     });
   }
+}
+
+function resolveSourceFile(extractDir: string, sourceFile: string): string {
+  const extractRoot = resolve(extractDir);
+  const absolutePath = resolve(extractRoot, sourceFile);
+  const relativePath = relative(extractRoot, absolutePath);
+
+  if (relativePath === "" || relativePath.startsWith("..") || relativePath.startsWith("/")) {
+    throw new DictionaryError("INVALID_SOURCE_FILE", "Raw HTML source file must stay inside extraction directory", {
+      extractDir,
+      sourceFile,
+    });
+  }
+
+  return absolutePath;
 }
 
 function buildSearchText(object: SchemaObject): string {

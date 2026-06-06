@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { DictionaryError } from "../../src/shared/errors.js";
-import { findObject, getDatabaseSummary, listObjects, searchObjects } from "../../src/shared/search.js";
+import { findObject, getDatabaseSummary, listObjects, readRawHtml, searchObjects } from "../../src/shared/search.js";
 import type { SchemaIndex } from "../../src/shared/types.js";
 
 const index: SchemaIndex = {
@@ -120,5 +120,11 @@ describe("search helpers", () => {
 
   it("throws for ambiguous object names", () => {
     expect(() => findObject(index, { name: "getdate" })).toThrow(DictionaryError);
+  });
+
+  it("rejects raw HTML source paths outside the extraction directory", async () => {
+    await expect(readRawHtml(index, { sourceFile: "../package.json" })).rejects.toMatchObject({
+      code: "INVALID_SOURCE_FILE",
+    });
   });
 });
